@@ -13,7 +13,6 @@ on:
 
 jobs:
   build:
-    if: ${{ hashFiles('Dockerfile') != '' }}
     runs-on: ubuntu-latest
     
     steps:
@@ -54,6 +53,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            ROS_DISTRO=jazzy
+            ROS_DISTRO=noetic
 
 

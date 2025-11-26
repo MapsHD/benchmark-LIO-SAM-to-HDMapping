@@ -6,4 +6,4 @@
 	url = https://github.com/Livox-SDK/livox_ros_driver.git
 [submodule "src/LIO-SAM"]
 	path = src/LIO-SAM
-	url = https://github.com/TixiaoShan/LIO-SAM.git
+	url = https://github.com/MapsHD/LIO-SAM.git
