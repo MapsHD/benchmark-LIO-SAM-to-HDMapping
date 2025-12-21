@@ -1,5 +1,9 @@
 # LIO-SAM-converter
 
+## Example Dataset: 
+
+Download the dataset from [Bunker DVI Dataset](https://charleshamesse.github.io/bunker-dvi-dataset/)  
+
 ## Intended use 
 
 This small toolset allows to integrate SLAM solution provided by [LIO-SAM](https://github.com/TixiaoShan/LIO-SAM/) with [HDMapping](https://github.com/MapsHD/HDMapping).
@@ -97,12 +101,6 @@ cd /test_ws/
 source ./devel/setup.sh # adjust to used shell
 rosrun lio-sam-to-hdmapping listener <recorded_bag> <output_dir>
 ```
-
-## Example:
-
-Download the dataset from [GitHub - ConSLAM](https://github.com/mac137/ConSLAM) or 
-directly from this [Google Drive link](https://drive.google.com/drive/folders/1TNDcmwLG_P1kWPz3aawCm9ts85kUTvnU). 
-Then, download **sequence2**.
 
 ## Modfifed 
 ```shell
