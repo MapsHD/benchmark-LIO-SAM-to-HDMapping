@@ -1,145 +1,48 @@
-# LIO-SAM-converter
+# LIO-SAM to HDMapping simplified instruction
 
-## Example Dataset: 
+**Note:** [LIO-SAM](https://github.com/TixiaoShan/LIO-SAM) requires a dense point cloud with a `ring` field and a 9-axis IMU (with orientation) in m/s². For this dataset's Livox Mid-360 data, an input adapter (`overlay/scripts/livox_input_adapter.py`) converts the cloud and the accelerometer units, and [imu_filter_madgwick](http://wiki.ros.org/imu_filter_madgwick) estimates the IMU orientation. LIO-SAM itself is unchanged; its Livox settings (`overlay/config/params_bunker.yaml`) follow upstream's README.
 
-Download the dataset from [Bunker DVI Dataset](https://charleshamesse.github.io/bunker-dvi-dataset/)  
+## Step 1 (prepare data)
+Download the dataset `reg-1.bag` by clicking [link](https://cloud.cylab.be/public.php/dav/files/7PgyjbM2CBcakN5/reg-1.bag) (it is part of [Bunker DVI Dataset](https://charleshamesse.github.io/bunker-dvi-dataset)) and convert with [tool](https://github.com/MapsHD/livox_bag_aggregate) to `reg-1.bag-pc.bag`.
 
-## Intended use 
+File `reg-1.bag-pc.bag` is an input for further calculations.
+It should be located in `~/hdmapping-benchmark/data`.
 
-This small toolset allows to integrate SLAM solution provided by [LIO-SAM](https://github.com/TixiaoShan/LIO-SAM/) with [HDMapping](https://github.com/MapsHD/HDMapping).
-This repository contains ROS 1 workspace that :
-  - submodule to tested revision of LIO-SAM
-  - a converter that listens to topics advertised from odometry node and save data in format compatible with HDMapping.
-
-## Dependencies
-
+## Step 2 (prepare docker)
 ```shell
-sudo apt install -y nlohmann-json3-dev
-
-sudo add-apt-repository ppa:borglab/gtsam-release-4.0
-sudo apt install libgtsam-dev libgtsam-unstable-dev
+mkdir -p ~/hdmapping-benchmark
+cd ~/hdmapping-benchmark
+git clone https://github.com/MapsHD/benchmark-LIO-SAM-to-HDMapping.git --recursive
+cd benchmark-LIO-SAM-to-HDMapping
+git checkout Bunker-DVI-Dataset-reg-1
+docker build -t lio-sam_noetic .
 ```
 
-## Modified for build
-
-**Reference issue:**  
-   ```shell     
-[catkin_make in ROS Noetic [Error] #206](https://github.com/TixiaoShan/LIO-SAM/issues/206)
-```
-
+## Step 3 (run docker, file `reg-1.bag-pc.bag` should be in `~/hdmapping-benchmark/data`)
 ```shell
-**Changes made:**
-
-  File:
-
-  test_ws/src/LIO-SAM-to-hdmapping/src/LeGO-LOAM/LeGO-LOAM/CMakeLists.txt
-
-   cmake
-
-#find_package(Boost REQUIRED COMPONENTS timer)
-find_package(Boost REQUIRED COMPONENTS serialization thread timer chrono)
-
-Updated C++ standard
-
-Replaced:
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3")
-
-With:
-
-    set(CMAKE_CXX_STANDARD 14)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-File:
-
-test_ws/src/LeGO-LOAM-to-hdmapping/src/LeGO-LOAM/LIO-SAM/include/utility.h
-
-Changes made:
-
-Added Eigen includes. Eigen must be installed above PCL.
-
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/Geometry>
-
-under pcl 
-
-#include <opencv/cv.h> to #include <opencv2/opencv.hpp>
-```
-## Building
-
-Clone the repo
-```shell
-mkdir -p /test_ws/src
-cd /test_ws/src
-git clone https://github.com/marcinmatecki/LIO-SAM-to-HDMapping.git --recursive
-cd ..
-catkin_make
+cd ~/hdmapping-benchmark/benchmark-LIO-SAM-to-HDMapping
+chmod +x docker_session_run-ros1-lio-sam.sh
+cd ~/hdmapping-benchmark/data
+~/hdmapping-benchmark/benchmark-LIO-SAM-to-HDMapping/docker_session_run-ros1-lio-sam.sh reg-1.bag-pc.bag .
 ```
 
-## Usage - data SLAM:
+While the bag plays you can watch LIO-SAM build the map live in RViz.
 
-Prepare recorded bag with estimated odometry:
+## Step 4 (Open and visualize data)
+Expected data should appear in `~/hdmapping-benchmark/data/output_hdmapping-LIO-SAM`.
+Use tool [multi_view_tls_registration_step_2](https://github.com/MapsHD/HDMapping) to open `session.json` from `~/hdmapping-benchmark/data/output_hdmapping-LIO-SAM`.
 
-In first terminal record bag:
-```shell
-rosbag record /lio_sam/mapping/cloud_registered /odometry/imu
-```
+You should see the following data in folder `~/hdmapping-benchmark/data/output_hdmapping-LIO-SAM`:
 
-and start odometry:
-```shell 
-cd /test_ws/
-source ./devel/setup.sh # adjust to used shell
-roslaunch lio_sam run.launch
-rosbag play your-bag.bag -r 3
-```
+lio_initial_poses.reg
 
-## Usage - conversion:
+poses.reg
 
-```shell
-cd /test_ws/
-source ./devel/setup.sh # adjust to used shell
-rosrun lio-sam-to-hdmapping listener <recorded_bag> <output_dir>
-```
+scan_lio_*.laz
 
-## Modfifed 
-```shell
-src/LIO-SAM-to-HDMapping/src/LIO-SAM/config/params.yaml
+session.json
 
-pointCloudTopic: "points_raw"
-imuTopic: "imu_raw"
+trajectory_lio_*.csv
 
-to:
-
-pointCloudTopic: "pp_points/synced2rgb"
-imuTopic: "/imu/data"
-```
-## Record the bag file:
-
-```shell
-rosbag record /lio_sam/mapping/cloud_registered /odometry/imu
-```
-
-## LIO_SAM Launch:
-
-```shell
-cd /test_ws/
-source ./devel/setup.sh # adjust to used shell
-roslaunch lio_sam run.launch
-rosbag play {path_to_bag}
-```
-
-## During the record (if you want to stop recording earlier) / after finishing the bag:
-
-```shell
-In the terminal where the ros record is, interrupt the recording by CTRL+C
-Do it also in ros launch terminal by CTRL+C.
-```
-
-## Usage - Conversion (ROS bag to HDMapping, after recording stops):
-
-```shell
-cd /test_ws/
-source ./devel/setup.sh # adjust to used shell
-rosrun lio-sam-to-hdmapping listener <recorded_bag> <output_dir>
-```
+## Contact email
+januszbedkowski@gmail.com

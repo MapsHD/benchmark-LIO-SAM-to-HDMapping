@@ -1,47 +1,17 @@
 <?xml version="1.0"?>
-<package format="3">
+<package format="2">
   <name>lio-sam-to-hdmapping</name>
-  <version>0.0.0</version>
-  <description>bag-lio-sam-bag-session convert</description>
-
-  <maintainer email="matecki.m@outlook.com">Marcin Matecki</maintainer>
-  <!-- One license tag required, multiple allowed, one license per tag -->
-  <!-- Commonly used license strings: -->
-  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
+  <version>0.0.1</version>
+  <description>Convert recorded LIO-SAM odometry bag to HDMapping session format</description>
+  <maintainer email="januszbedkowski@gmail.com">Janusz Bedkowski</maintainer>
   <license>MIT</license>
-
-  <!-- <buildtool_depend>ament_cmake</buildtool_depend> -->
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend>nav_msgs</build_depend>
-  <build_depend>roscpp</build_depend>
-  <build_depend>rospy</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_depend>sensor_msgs</build_depend>
-  <build_depend>tf</build_depend>
-  <build_depend>pcl_ros</build_depend>
-  <build_depend>livox_ros_driver</build_depend>
-  <build_depend>message_generation</build_depend>
-  <build_depend>rosbag</build_depend> 
-
-  <exec_depend>geometry_msgs</exec_depend>
-  <exec_depend>nav_msgs</exec_depend>
-  <exec_depend>sensor_msgs</exec_depend>
-  <exec_depend>roscpp</exec_depend>
-  <exec_depend>rospy</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
-  <exec_depend>tf</exec_depend>
-  <exec_depend>pcl_ros</exec_depend>
-  <exec_depend>livox_ros_driver</exec_depend>
-  <exec_depend>rosbag</exec_depend> 
-  <!-- The export tag contains other, unspecified, tags -->
-  <export>
-    <!-- Other tools can request additional information be placed here -->
-  </export>
-  
- <!--  <export>
-    <build_type>ament_cmake</build_type>
-  </export>-->
+  <depend>roscpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>rosgraph_msgs</depend>
+  <depend>rosbag</depend>
+  <depend>pcl_conversions</depend>
 </package>
