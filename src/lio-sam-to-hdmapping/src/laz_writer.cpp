@@ -113,7 +113,7 @@ bool saveLaz(const std::string &filename, const std::vector<Point3Di> &points_gl
     laszip_I64 p_count = 0;
     laszip_F64 coordinates[3];
 
-    for (size_t i = 0; i < points_global.size(); i++)
+    for (int i = 0; i < points_global.size(); i++)
     {
         const auto &p = points_global[i];
         point->intensity = p.intensity;
@@ -124,13 +124,13 @@ bool saveLaz(const std::string &filename, const std::vector<Point3Di> &points_gl
         coordinates[2] = p.point.z();
         if (laszip_set_coordinates(laszip_writer, coordinates))
         {
-            fprintf(stderr, "DLL ERROR: setting coordinates for point %ld\n", (long)p_count);
+            fprintf(stderr, "DLL ERROR: setting coordinates for point %I64d\n", p_count);
             return false;
         }
 
         if (laszip_write_point(laszip_writer))
         {
-            fprintf(stderr, "DLL ERROR: writing point %ld\n", (long)p_count);
+            fprintf(stderr, "DLL ERROR: writing point %I64d\n", p_count);
             return false;
         }
     }
@@ -141,7 +141,7 @@ bool saveLaz(const std::string &filename, const std::vector<Point3Di> &points_gl
         return false;
     }
 
-    fprintf(stderr, "successfully written %ld points\n", (long)p_count);
+    fprintf(stderr, "successfully written %I64d points\n", p_count);
 
     // close the writer
 
