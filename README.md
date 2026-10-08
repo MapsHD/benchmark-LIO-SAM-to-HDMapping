@@ -26,11 +26,17 @@ cd ~/hdmapping-benchmark/data
 ~/hdmapping-benchmark/benchmark-LIO-SAM-to-HDMapping/docker_session_run-ros1-lio-sam.sh reg-1.bag-pc.bag .
 ```
 
-While the bag plays you can watch LIO-SAM build the map live in RViz.
+While the bag plays you can watch LIO-SAM build the map live in RViz:
+
+![LIO-SAM running in RViz](images/RVIZ_1.png)
+
+![LIO-SAM running in RViz, later in the run](images/RVIZ_2.png)
 
 ## Step 4 (Open and visualize data)
 Expected data should appear in `~/hdmapping-benchmark/data/output_hdmapping-LIO-SAM`.
 Use tool [multi_view_tls_registration_step_2](https://github.com/MapsHD/HDMapping) to open `session.json` from `~/hdmapping-benchmark/data/output_hdmapping-LIO-SAM`.
+
+![LIO-SAM session opened in HDMapping multi_view_tls_registration_step_2](images/STEP_2.png)
 
 You should see the following data in folder `~/hdmapping-benchmark/data/output_hdmapping-LIO-SAM`:
 
