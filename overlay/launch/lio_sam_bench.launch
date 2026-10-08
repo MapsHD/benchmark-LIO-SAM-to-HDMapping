@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!-- Benchmark launch for LIO-SAM: upstream run.launch without the GPS (navsat)
+     module, with a selectable params file and, for Livox Mid-360 input, the
+     input adapter plus imu_filter_madgwick in front of LIO-SAM.
+
+     adapter:=true   bag LiDAR (cloud_in) and IMU (imu_in) go through
+                     livox_input_adapter.py (dense cloud, ring field, accel in
+                     m/s^2) to /points_raw and /imu/data_raw; imu_filter_madgwick
+                     adds the orientation LIO-SAM requires and publishes
+                     /imu/data (the imuTopic of params_bunker.yaml).
+     adapter:=false  the bag must already match the params file topics.
+
+     The ROS clock is left as is (no use_sim_time): LIO-SAM, the adapter and
+     the IMU filter all propagate the input header stamps. -->
+<launch>
+
+    <arg name="project"  default="lio_sam"/>
+    <arg name="params"   default="params_bunker.yaml"/>
+    <arg name="adapter"  default="true"/>
+    <arg name="cloud_in" default="/livox/pointcloud"/>
+    <arg name="imu_in"   default="/livox/imu"/>
+    <arg name="rviz"     default="true"/>
+
+    <rosparam file="$(find lio_sam)/config/$(arg params)" command="load" />
+
+    <group if="$(arg adapter)">
+        <node pkg="lio_sam" type="livox_input_adapter.py" name="livox_input_adapter" output="screen">
+            <param name="cloud_in"  value="$(arg cloud_in)"/>
+            <param name="imu_in"    value="$(arg imu_in)"/>
+            <param name="cloud_out" value="/points_raw"/>
+            <param name="imu_out"   value="/imu/data_raw"/>
+        </node>
+        <node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter_madgwick" output="screen">
+            <param name="use_mag"     value="false"/>
+            <param name="publish_tf"  value="false"/>
+            <param name="world_frame" value="enu"/>
+        </node>
+    </group>
+
+    <include file="$(find lio_sam)/launch/include/module_loam.launch">
+        <arg name="project" value="$(arg project)"/>
+    </include>
+
+    <include file="$(find lio_sam)/launch/include/module_robot_state_publisher.launch">
+        <arg name="project" value="$(arg project)"/>
+    </include>
+
+    <group if="$(arg rviz)">
+        <include file="$(find lio_sam)/launch/include/module_rviz.launch">
+            <arg name="project" value="$(arg project)"/>
+        </include>
+    </group>
+
+</launch>
